@@ -1,16 +1,19 @@
 clear all;
 close all;
 
-% parameter setting
-a = 40;
-b = 30;
+% Input file
+I = imread('ArabicSign-00007-small.jpg');
+I = double(rgb2gray(I));
+
+% Parameter setting
+a = size(I,1)/25;
+b = size(I,2)/25;
 t1 = 15;
 t2 = 40;
 t3 = -2;
 t4 = 3;
 
-I = imread('ArabicSign-00071-small.jpg');
-I = uint8(rgb2gray(I));
+% Initialization
 Sx = [-1 0 1;-2 0 2;-1 0 1];
 Sy = Sx';
 dx = imfilter(I,Sx);
@@ -87,6 +90,13 @@ I_edge_pad = padarray(I_edge, [pad_row pad_col], 0);
 I_orn_t_pad = padarray(I_orn_t, [pad_row pad_col], 0);
 I_orn_l_pad = padarray(I_orn_l, [pad_row pad_col], 0);
 
+%%%%%%%%%%%%% test pattern, to be removed %%%%%%%%%
+% I_edge = zeros(size(I_edge,1),size(I_edge,2));
+% I_edge(30:40,:) = 10;
+% I_edge(50:60,:) = 10;
+% I_edge_pad = padarray(I_edge, [pad_row pad_col], 0);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 tic;
 for row = 1:img_row
 	for col = 1:img_col
@@ -137,17 +147,31 @@ imagesc(I_tcm2);
 
 %%%%%%%%%%%%%%%% Evaluation %%%%%%%%%%%%%
 close all;
-n=2:5; % Range of N in OTSU algo
-
-subplot(1,size(n,2)+2,1);
+n = 2:3; % Different no of divided regions (OTSU algo) to be shown
+pre_img_no = 5;
+subplot(1,size(n,2)+pre_img_no,1);
 imagesc(I);
-title(['Image'])
-subplot(1,size(n,2)+2,2);
+title('Image')
+
+subplot(1,size(n,2)+pre_img_no,2);
+imagesc(I_edge);
+title('Edge')
+
+subplot(1,size(n,2)+pre_img_no,3);
+imagesc(I_dns);
+title('D');
+
+subplot(1,size(n,2)+pre_img_no,4);
+imagesc(I_tcm1);
+title('D+EOV');
+
+subplot(1,size(n,2)+pre_img_no,5);
 imagesc(I_tcm2);
-title(['TCM']);
+title('D+EOV+OEP');
+
 for i=n
     IDX = otsu(I_tcm2,i);
-    subplot(1,size(n,2)+2,i-n(1)+3);
+    subplot(1,size(n,2)+pre_img_no,i-n(1)+pre_img_no+1);
     imagesc(IDX);
     title(['n = ' int2str(i)]);
 end
